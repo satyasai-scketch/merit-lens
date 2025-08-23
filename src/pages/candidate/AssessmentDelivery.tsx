@@ -23,15 +23,32 @@ export default function AssessmentDelivery() {
   useEffect(() => {
     if (!attemptId) return;
 
-    // Load attempt state
-    const state = loadAttemptState(attemptId);
+    // Load attempt state - check both attempt state and attempts list
+    let state = loadAttemptState(attemptId);
+    
     if (!state) {
-      toast({
-        title: "Assessment Not Found",
-        description: "This assessment attempt could not be found.",
-        variant: "destructive"
-      });
-      navigate('/candidate');
+      // Try to find in attempts list and create state if found
+      const attempts = JSON.parse(localStorage.getItem('assessment_attempts') || '[]');
+      const attempt = attempts.find((a: any) => a.attemptId === attemptId);
+      
+      if (attempt) {
+        // Create initial attempt state
+        state = {
+          attemptId: attempt.attemptId,
+          componentType: attempt.componentType,
+          currentItemIndex: 0,
+          responses: {},
+          startedAt: attempt.startedAt,
+          lastSavedAt: new Date().toISOString(),
+          status: 'in-progress'
+        };
+        saveAttemptState(state);
+      }
+    }
+    
+    if (!state) {
+      // Show error page instead of toast and redirect
+      setLoading(false);
       return;
     }
 
@@ -193,10 +210,40 @@ export default function AssessmentDelivery() {
     navigate('/candidate');
   };
 
-  if (loading || !assessment || !attemptState) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full"></div>
+      </div>
+    );
+  }
+
+  // Show error page if assessment attempt not found
+  if (!assessment || !attemptState) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="max-w-md mx-auto text-center space-y-4 p-6">
+          <div className="text-6xl mb-4">📋</div>
+          <h1 className="text-2xl font-bold">Assessment Not Found</h1>
+          <p className="text-muted-foreground">
+            This assessment attempt could not be found. Please return to the Assessments page to start or continue your assessments.
+          </p>
+          <div className="space-y-2">
+            <Button 
+              onClick={() => navigate('/candidate/assessments')}
+              className="w-full"
+            >
+              Back to Assessments
+            </Button>
+            <Button 
+              onClick={() => navigate('/candidate')}
+              variant="outline"
+              className="w-full"
+            >
+              Back to Dashboard
+            </Button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -340,7 +387,172 @@ export default function AssessmentDelivery() {
                 </div>
               )}
 
-              {/* Add other item types as needed */}
+              {currentItem.type === 'ranking' && (
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground">Drag items to reorder them, or use the buttons to move items up/down:</p>
+                  <div className="space-y-2">
+                    {(responses[currentItem.id]?.value || currentItem.options || currentItem.tokens || []).map((item: string, index: number) => (
+                      <div key={item} className="flex items-center gap-3 p-3 border rounded-lg">
+                        <span className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-medium">
+                          {index + 1}
+                        </span>
+                        <span className="flex-1">{item}</span>
+                        <div className="flex gap-1">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              const currentList = responses[currentItem.id]?.value || currentItem.options || currentItem.tokens || [];
+                              if (index > 0) {
+                                const newList = [...currentList];
+                                [newList[index], newList[index - 1]] = [newList[index - 1], newList[index]];
+                                handleResponse(currentItem.id, { type: 'ranking', value: newList });
+                              }
+                            }}
+                            disabled={index === 0}
+                          >
+                            ↑
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              const currentList = responses[currentItem.id]?.value || currentItem.options || currentItem.tokens || [];
+                              if (index < currentList.length - 1) {
+                                const newList = [...currentList];
+                                [newList[index], newList[index + 1]] = [newList[index + 1], newList[index]];
+                                handleResponse(currentItem.id, { type: 'ranking', value: newList });
+                              }
+                            }}
+                            disabled={index === (responses[currentItem.id]?.value || currentItem.options || currentItem.tokens || []).length - 1}
+                          >
+                            ↓
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {currentItem.type === 'sequence' && (
+                <div className="space-y-4">
+                  {!responses[currentItem.id] ? (
+                    <div className="text-center space-y-4">
+                      <div className="p-6 border-2 border-dashed rounded-lg">
+                        <p className="text-sm text-muted-foreground mb-4">Memorize this sequence:</p>
+                        <div className="flex justify-center gap-2 mb-4">
+                          {currentItem.sequence?.map((item: string, index: number) => (
+                            <span key={index} className="px-3 py-2 bg-primary/10 rounded-lg font-mono text-lg">
+                              {item}
+                            </span>
+                          ))}
+                        </div>
+                        <Button
+                          onClick={() => {
+                            handleResponse(currentItem.id, { type: 'sequence', phase: 'input', value: [] });
+                          }}
+                        >
+                          I'm Ready - Start Input
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <p className="text-sm text-muted-foreground">Enter the sequence in the correct order:</p>
+                      <div className="flex justify-center gap-2 mb-4">
+                        {(responses[currentItem.id]?.value || []).map((item: string, index: number) => (
+                          <span key={index} className="px-3 py-2 bg-primary/10 rounded-lg font-mono text-lg">
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="flex justify-center gap-2 flex-wrap">
+                        {currentItem.sequence?.map((item: string) => (
+                          <Button
+                            key={item}
+                            variant="outline"
+                            onClick={() => {
+                              const current = responses[currentItem.id]?.value || [];
+                              const newValue = [...current, item];
+                              handleResponse(currentItem.id, { type: 'sequence', phase: 'input', value: newValue });
+                            }}
+                            disabled={(responses[currentItem.id]?.value || []).includes(item)}
+                          >
+                            {item}
+                          </Button>
+                        ))}
+                      </div>
+                      {responses[currentItem.id]?.value?.length > 0 && (
+                        <div className="text-center">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              handleResponse(currentItem.id, { type: 'sequence', phase: 'input', value: [] });
+                            }}
+                          >
+                            Clear & Start Over
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {currentItem.type === 'audio' && (
+                <div className="space-y-4">
+                  <div className="bg-accent/50 p-4 rounded-lg">
+                    <p className="text-sm text-muted-foreground mb-3">Listen to the target audio:</p>
+                    <audio controls className="w-full mb-3">
+                      <source src={currentItem.audioUrl} type="audio/mpeg" />
+                      Your browser does not support the audio element.
+                    </audio>
+                    <p className="text-xs text-muted-foreground">
+                      Audio transcription available on request for accessibility.
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Select the matching audio:</p>
+                    {currentItem.choices?.map((choice: string, index: number) => (
+                      <label key={index} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-accent cursor-pointer">
+                        <input
+                          type="radio"
+                          name={`item-${currentItem.id}`}
+                          value={choice}
+                          checked={responses[currentItem.id]?.value === choice}
+                          onChange={(e) => handleResponse(currentItem.id, { type: 'audio', value: e.target.value })}
+                          className="text-primary"
+                        />
+                        <audio controls className="flex-1">
+                          <source src={choice} type="audio/mpeg" />
+                          Option {index + 1}
+                        </audio>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {currentItem.type === 'dilemma' && (
+                <div className="space-y-2">
+                  {currentItem.options?.map((option: string, index: number) => (
+                    <label key={index} className="flex items-start space-x-3 p-4 border rounded-lg hover:bg-accent cursor-pointer">
+                      <input
+                        type="radio"
+                        name={`item-${currentItem.id}`}
+                        value={option}
+                        checked={responses[currentItem.id]?.value === option}
+                        onChange={(e) => handleResponse(currentItem.id, { type: 'dilemma', value: e.target.value })}
+                        className="text-primary mt-1"
+                      />
+                      <span className="flex-1">{option}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Navigation */}

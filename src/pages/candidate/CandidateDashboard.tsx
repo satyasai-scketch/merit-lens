@@ -89,8 +89,9 @@ export default function CandidateDashboard() {
       return;
     }
 
-    // Create new attempt
-    const attemptId = `${componentId}_${Date.now()}`;
+    // Create new attempt with more robust ID
+    const timestamp = Date.now();
+    const attemptId = `attempt_${componentId}_${timestamp}`;
     const attempts = JSON.parse(localStorage.getItem('assessment_attempts') || '[]');
     
     attempts.push({

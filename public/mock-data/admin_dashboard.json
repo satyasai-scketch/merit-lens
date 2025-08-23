@@ -1,0 +1,38 @@
+{
+  "kpis": {
+    "invited": 150,
+    "started": 132,
+    "completed": 108,
+    "avgMinutes": 42,
+    "completionRate": 82
+  },
+  "buckets": {
+    "Admit": 52,
+    "Counselling": 31,
+    "Bridge": 19,
+    "Reject": 6
+  },
+  "trend": [
+    { "date": "2025-08-01", "completed": 3 },
+    { "date": "2025-08-02", "completed": 7 },
+    { "date": "2025-08-03", "completed": 5 },
+    { "date": "2025-08-04", "completed": 12 },
+    { "date": "2025-08-05", "completed": 8 },
+    { "date": "2025-08-06", "completed": 15 },
+    { "date": "2025-08-07", "completed": 18 },
+    { "date": "2025-08-08", "completed": 22 },
+    { "date": "2025-08-09", "completed": 18 }
+  ],
+  "funnel": [
+    { "stage": "Invited", "count": 150 },
+    { "stage": "Started", "count": 132 },
+    { "stage": "Completed", "count": 108 }
+  ],
+  "scoreDistribution": [
+    { "range": "0-20", "count": 2 },
+    { "range": "21-40", "count": 8 },
+    { "range": "41-60", "count": 31 },
+    { "range": "61-80", "count": 45 },
+    { "range": "81-100", "count": 22 }
+  ]
+}

@@ -1,0 +1,16 @@
+[
+  {
+    "id": "t-kerala",
+    "name": "Kerala Language Institute",
+    "logoUrl": "/logos/kerala.png",
+    "primaryColor": "#1e40af",
+    "website": "https://kerala-lang.edu"
+  },
+  {
+    "id": "t-mumbai",
+    "name": "Mumbai International Academy",
+    "logoUrl": "/logos/mumbai.png",
+    "primaryColor": "#059669",
+    "website": "https://mumbai-academy.edu"
+  }
+]

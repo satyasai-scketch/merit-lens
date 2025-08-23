@@ -1,0 +1,44 @@
+{
+  "attemptId": "flat-demo-1",
+  "candidateId": "c-101",
+  "tenantId": "t-kerala",
+  "timestamp": "2025-08-15T14:30:00Z",
+  "scores": {
+    "FLAT": 68,
+    "ASP": 61,
+    "VAL": 59,
+    "MS": 72,
+    "COMPOSITE": 65
+  },
+  "subskillScores": {
+    "phonetic": 71,
+    "grammar": 64,
+    "vocab": 69,
+    "audio": 72,
+    "memory": 65
+  },
+  "bucket": "Counselling",
+  "confidence": 0.85,
+  "drivers": [
+    "FLAT score slightly below admission threshold (68 vs 70 required)",
+    "Strong growth mindset (72) indicates good learning potential",
+    "Values alignment moderate (59) - may need cultural integration support",
+    "Aspiration score acceptable (61) showing commitment to learning"
+  ],
+  "nextSteps": [
+    "Enroll in Bridge Program: Grammar and Vocabulary intensive",
+    "Schedule counselling session within 2 weeks",
+    "Consider cultural orientation program",
+    "Retest eligibility after 30 days of Bridge program completion"
+  ],
+  "strengths": [
+    "Excellent phonetic sensitivity",
+    "Strong working memory",
+    "Growth-oriented mindset"
+  ],
+  "developmentAreas": [
+    "Grammatical pattern recognition",
+    "Academic vocabulary expansion",
+    "Cultural value integration"
+  ]
+}

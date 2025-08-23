@@ -1,0 +1,42 @@
+[
+  {
+    "id": "c-101",
+    "name": "Asha Kumar",
+    "email": "asha.kumar@example.com",
+    "eligibleRetest": true,
+    "lastComposite": 57,
+    "bucket": "Bridge",
+    "lastAttemptDate": "2025-08-15",
+    "retestReason": "Technical issues during FLAT assessment"
+  },
+  {
+    "id": "c-102",
+    "name": "Ravi Shah",
+    "email": "ravi.shah@example.com",
+    "eligibleRetest": false,
+    "lastComposite": 74,
+    "bucket": "Admit",
+    "lastAttemptDate": "2025-08-18",
+    "retestReason": null
+  },
+  {
+    "id": "c-103",
+    "name": "Priya Patel",
+    "email": "priya.patel@example.com",
+    "eligibleRetest": true,
+    "lastComposite": 48,
+    "bucket": "Counselling",
+    "lastAttemptDate": "2025-08-12",
+    "retestReason": "Requested review of Values assessment"
+  },
+  {
+    "id": "c-104",
+    "name": "Ahmed Hassan",
+    "email": "ahmed.hassan@example.com",
+    "eligibleRetest": false,
+    "lastComposite": 82,
+    "bucket": "Admit",
+    "lastAttemptDate": "2025-08-20",
+    "retestReason": null
+  }
+]

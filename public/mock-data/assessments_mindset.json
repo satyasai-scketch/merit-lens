@@ -1,0 +1,51 @@
+{
+  "id": "mindset",
+  "name": "Learning Mindset Inventory",
+  "description": "Evaluates growth vs. fixed mindset orientation, resilience, and attitudes toward learning challenges.",
+  "estimatedMinutes": 12,
+  "items": [
+    {
+      "id": "ms-1",
+      "type": "likert",
+      "stem": "You can always change your basic intelligence level substantially.",
+      "scale": 6,
+      "labels": ["Strongly Disagree", "Disagree", "Mostly Disagree", "Mostly Agree", "Agree", "Strongly Agree"],
+      "reverse": false
+    },
+    {
+      "id": "ms-2",
+      "type": "likert",
+      "stem": "No matter how hard you try, you can't really change your basic abilities.",
+      "scale": 6,
+      "labels": ["Strongly Disagree", "Disagree", "Mostly Disagree", "Mostly Agree", "Agree", "Strongly Agree"],
+      "reverse": true
+    },
+    {
+      "id": "ms-3",
+      "type": "likert",
+      "stem": "When I fail at something, I tend to give up quickly.",
+      "scale": 6,
+      "labels": ["Strongly Disagree", "Disagree", "Mostly Disagree", "Mostly Agree", "Agree", "Strongly Agree"],
+      "reverse": true
+    },
+    {
+      "id": "ms-4",
+      "type": "single",
+      "stem": "When facing a difficult learning challenge, I typically:",
+      "options": [
+        "Avoid it to prevent failure",
+        "Try once and move on if it's hard",
+        "Keep trying different approaches",
+        "Seek help and persist until I understand"
+      ]
+    },
+    {
+      "id": "ms-5",
+      "type": "likert",
+      "stem": "Making mistakes is an essential part of learning.",
+      "scale": 6,
+      "labels": ["Strongly Disagree", "Disagree", "Mostly Disagree", "Mostly Agree", "Agree", "Strongly Agree"],
+      "reverse": false
+    }
+  ]
+}

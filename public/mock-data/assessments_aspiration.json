@@ -1,0 +1,41 @@
+{
+  "id": "aspiration",
+  "name": "Academic Aspiration Survey",
+  "description": "Measures motivation for language learning, career goals, cultural interest, and academic commitment.",
+  "estimatedMinutes": 15,
+  "items": [
+    {
+      "id": "asp-1",
+      "type": "likert",
+      "stem": "I am excited about exploring new cultures through language learning.",
+      "scale": 5,
+      "labels": ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
+    },
+    {
+      "id": "asp-2",
+      "type": "ranking",
+      "stem": "Rank these priorities in order of importance to you:",
+      "options": ["Family relationships", "Career advancement", "Personal adventure", "Financial security"]
+    },
+    {
+      "id": "asp-3",
+      "type": "likert",
+      "stem": "Learning a new language is essential for my career goals.",
+      "scale": 5,
+      "labels": ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
+    },
+    {
+      "id": "asp-4",
+      "type": "single",
+      "stem": "What is your primary motivation for language learning?",
+      "options": ["Academic requirements", "Career opportunities", "Personal interest", "Travel plans", "Family heritage"]
+    },
+    {
+      "id": "asp-5",
+      "type": "likert",
+      "stem": "I am willing to dedicate significant time daily to language practice.",
+      "scale": 5,
+      "labels": ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
+    }
+  ]
+}

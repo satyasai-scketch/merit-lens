@@ -1,0 +1,32 @@
+[
+  {
+    "id": "u1",
+    "tenantId": "t-kerala",
+    "role": "candidate",
+    "email": "asha.kumar@example.com",
+    "name": "Asha Kumar",
+    "currentIntakeId": "intake-2025-spring"
+  },
+  {
+    "id": "u2",
+    "tenantId": "t-kerala",
+    "role": "admin",
+    "email": "admin@kerala-lang.edu",
+    "name": "Dr. Priya Nair"
+  },
+  {
+    "id": "u3",
+    "tenantId": "t-kerala",
+    "role": "super",
+    "email": "super@meritlens.com",
+    "name": "System Administrator"
+  },
+  {
+    "id": "u4",
+    "tenantId": "t-mumbai",
+    "role": "candidate",
+    "email": "ravi.shah@example.com",
+    "name": "Ravi Shah",
+    "currentIntakeId": "intake-mumbai-2025"
+  }
+]

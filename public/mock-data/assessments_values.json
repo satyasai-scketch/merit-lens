@@ -1,0 +1,49 @@
+{
+  "id": "values",
+  "name": "Personal Values Assessment",
+  "description": "Identifies core personal values and their alignment with academic and cultural integration goals.",
+  "estimatedMinutes": 20,
+  "values": [
+    "Universalism", "Benevolence", "Tradition", "Power",
+    "Hedonism", "Conformity", "Security", "Achievement",
+    "Stimulation", "Self-direction"
+  ],
+  "items": [
+    {
+      "id": "val-1",
+      "type": "likert",
+      "value": "Universalism",
+      "stem": "Protecting the environment is important to me.",
+      "scale": 7,
+      "labels": ["Not at all important", "Very unimportant", "Unimportant", "Neither", "Important", "Very important", "Extremely important"]
+    },
+    {
+      "id": "val-2",
+      "type": "dilemma",
+      "stem": "You find a wallet with money on the street. What do you do?",
+      "options": ["Keep the money", "Report it to authorities", "Leave it where you found it", "Ask people nearby if it's theirs"]
+    },
+    {
+      "id": "val-3",
+      "type": "likert",
+      "value": "Achievement",
+      "stem": "Being successful and recognized for my achievements is very important to me.",
+      "scale": 7,
+      "labels": ["Not at all important", "Very unimportant", "Unimportant", "Neither", "Important", "Very important", "Extremely important"]
+    },
+    {
+      "id": "val-4",
+      "type": "ranking",
+      "stem": "Rank these life priorities in order of importance:",
+      "options": ["Personal happiness", "Professional success", "Family harmony", "Social recognition", "Financial stability"]
+    },
+    {
+      "id": "val-5",
+      "type": "likert",
+      "value": "Security",
+      "stem": "Having a stable, predictable life is important to me.",
+      "scale": 7,
+      "labels": ["Not at all important", "Very unimportant", "Unimportant", "Neither", "Important", "Very important", "Extremely important"]
+    }
+  ]
+}

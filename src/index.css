@@ -2,41 +2,91 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Professional Assessment Portal Design System */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @layer base {
   :root {
+    /* Professional Education Palette */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 215 25% 20%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 215 25% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 215 25% 20%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary: Deep Academic Blue */
+    --primary: 210 90% 25%;
+    --primary-foreground: 0 0% 98%;
+    --primary-light: 210 85% 40%;
+    --primary-lighter: 210 80% 85%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary: Warm Academic Orange */
+    --secondary: 25 95% 60%;
+    --secondary-foreground: 215 25% 20%;
+    --secondary-light: 25 90% 75%;
+    --secondary-lighter: 25 85% 90%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Success: Academic Green */
+    --success: 140 70% 35%;
+    --success-foreground: 0 0% 98%;
+    --success-light: 140 65% 50%;
+    --success-lighter: 140 60% 85%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Warning: Assessment Yellow */
+    --warning: 40 95% 50%;
+    --warning-foreground: 215 25% 20%;
+    --warning-light: 40 90% 70%;
+    --warning-lighter: 40 85% 90%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Info: Professional Teal */
+    --info: 180 70% 40%;
+    --info-foreground: 0 0% 98%;
+    --info-light: 180 65% 55%;
+    --info-lighter: 180 60% 85%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Neutral Grays */
+    --muted: 215 15% 96%;
+    --muted-foreground: 215 15% 45%;
+    --accent: 215 15% 94%;
+    --accent-foreground: 215 25% 20%;
 
-    --radius: 0.5rem;
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 215 15% 88%;
+    --input: 215 15% 94%;
+    --ring: 210 90% 25%;
+
+    --radius: 0.75rem;
+
+    /* Assessment-specific colors */
+    --assessment-flat: 260 85% 45%;
+    --assessment-aspiration: 320 75% 50%;
+    --assessment-values: 45 90% 55%;
+    --assessment-mindset: 160 70% 45%;
+
+    /* Status colors */
+    --status-not-started: 215 15% 70%;
+    --status-in-progress: 40 95% 50%;
+    --status-completed: 140 70% 35%;
+    --status-submitted: 210 90% 25%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-light)));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--secondary-light)));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--info)) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%);
+
+    /* Shadows */
+    --shadow-subtle: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-moderate: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-strong: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-glow: 0 0 20px hsl(var(--primary) / 0.15);
+
+    /* Sidebar variables for potential use */
 
     --sidebar-background: 0 0% 98%;
 
@@ -100,6 +150,117 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-inter;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+}
+
+@layer components {
+  /* Assessment Component Cards */
+  .assessment-card {
+    @apply bg-card border border-border rounded-lg p-6 shadow-subtle hover:shadow-moderate transition-all duration-200;
+  }
+
+  .assessment-card-flat {
+    @apply border-l-4 border-l-[hsl(var(--assessment-flat))];
+  }
+
+  .assessment-card-aspiration {
+    @apply border-l-4 border-l-[hsl(var(--assessment-aspiration))];
+  }
+
+  .assessment-card-values {
+    @apply border-l-4 border-l-[hsl(var(--assessment-values))];
+  }
+
+  .assessment-card-mindset {
+    @apply border-l-4 border-l-[hsl(var(--assessment-mindset))];
+  }
+
+  /* Status Badges */
+  .status-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .status-not-started {
+    @apply bg-[hsl(var(--status-not-started)_/_0.2)] text-[hsl(var(--status-not-started))] border border-[hsl(var(--status-not-started)_/_0.3)];
+  }
+
+  .status-in-progress {
+    @apply bg-[hsl(var(--status-in-progress)_/_0.2)] text-[hsl(var(--warning-foreground))] border border-[hsl(var(--status-in-progress)_/_0.3)];
+  }
+
+  .status-completed {
+    @apply bg-[hsl(var(--status-completed)_/_0.2)] text-[hsl(var(--success-foreground))] border border-[hsl(var(--status-completed)_/_0.3)];
+  }
+
+  .status-submitted {
+    @apply bg-[hsl(var(--status-submitted)_/_0.2)] text-[hsl(var(--primary-foreground))] border border-[hsl(var(--status-submitted)_/_0.3)];
+  }
+
+  /* Bucket Badges */
+  .bucket-admit {
+    @apply bg-[hsl(var(--success)_/_0.15)] text-[hsl(var(--success))] border border-[hsl(var(--success)_/_0.3)] px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .bucket-counselling {
+    @apply bg-[hsl(var(--warning)_/_0.15)] text-[hsl(var(--warning-foreground))] border border-[hsl(var(--warning)_/_0.3)] px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .bucket-bridge {
+    @apply bg-[hsl(var(--info)_/_0.15)] text-[hsl(var(--info))] border border-[hsl(var(--info)_/_0.3)] px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .bucket-reject {
+    @apply bg-[hsl(var(--destructive)_/_0.15)] text-[hsl(var(--destructive))] border border-[hsl(var(--destructive)_/_0.3)] px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  /* Score Gauge */
+  .score-gauge {
+    @apply relative w-32 h-32 mx-auto;
+  }
+
+  /* Navigation */
+  .nav-link {
+    @apply flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground;
+  }
+
+  .nav-link.active {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90;
+  }
+
+  /* Form Elements */
+  .form-group {
+    @apply space-y-2;
+  }
+
+  /* Hero Gradients */
+  .gradient-hero {
+    background: var(--gradient-hero);
+  }
+
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .gradient-secondary {
+    background: var(--gradient-secondary);
+  }
+
+  /* Assessment Timer */
+  .timer-warning {
+    @apply text-[hsl(var(--warning))] animate-pulse;
+  }
+
+  .timer-critical {
+    @apply text-[hsl(var(--destructive))] animate-pulse;
+  }
+
+  /* Code/Data Display */
+  .mono {
+    @apply font-mono text-sm;
   }
 }

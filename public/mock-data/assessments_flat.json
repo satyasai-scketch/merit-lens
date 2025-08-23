@@ -1,0 +1,64 @@
+{
+  "id": "flat",
+  "name": "Foreign Language Aptitude Test",
+  "description": "Assesses innate language learning ability across phonetic sensitivity, grammatical inference, vocabulary retention, audio processing, and working memory.",
+  "estimatedMinutes": 35,
+  "blueprint": {
+    "phonetic": 5,
+    "grammar": 5,
+    "vocab": 5,
+    "audio": 5,
+    "memory": 4
+  },
+  "items": [
+    {
+      "id": "flat-1",
+      "type": "single",
+      "subskill": "grammar",
+      "stem": "In the constructed language Lunari, the suffix '-ul' is used to pluralize nouns. Which of the following is the plural form of 'karo' (meaning 'book')?",
+      "options": ["karo", "karoul", "karu", "karela"],
+      "timerSec": 60
+    },
+    {
+      "id": "flat-2",
+      "type": "multi",
+      "subskill": "vocab",
+      "stem": "In Lunari, select all words that mean 'small' based on the pattern examples given:",
+      "options": ["mino", "grande", "peti", "alto"],
+      "timerSec": 60
+    },
+    {
+      "id": "flat-3",
+      "type": "ranking",
+      "subskill": "phonetic",
+      "stem": "Order these syllables to form the Lunari word 'lanori' (meaning 'beautiful'):",
+      "tokens": ["la", "no", "ri"],
+      "timerSec": 75
+    },
+    {
+      "id": "flat-4",
+      "type": "sequence",
+      "subskill": "memory",
+      "stem": "Memorize this sequence of Lunari syllables, then reproduce them in order:",
+      "sequence": ["ka", "lu", "me", "ta"],
+      "timerSec": 45
+    },
+    {
+      "id": "flat-5",
+      "type": "audio",
+      "subskill": "audio",
+      "stem": "Listen to the target pronunciation. Which of the following audio clips matches it most closely?",
+      "audioUrl": "/audio/target-1.mp3",
+      "choices": ["/audio/a1.mp3", "/audio/a2.mp3", "/audio/a3.mp3"],
+      "timerSec": 60
+    },
+    {
+      "id": "flat-6",
+      "type": "single",
+      "subskill": "grammar",
+      "stem": "Based on the pattern, what prefix indicates past tense in Lunari?",
+      "options": ["vo-", "ka-", "mi-", "ta-"],
+      "timerSec": 60
+    }
+  ]
+}

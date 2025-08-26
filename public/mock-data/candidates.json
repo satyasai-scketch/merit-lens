@@ -1,42 +1,57 @@
 [
   {
     "id": "c-101",
-    "name": "Asha Kumar",
-    "email": "asha.kumar@example.com",
+    "name": "Asha Krishnan",
+    "email": "asha.k@example.com",
     "eligibleRetest": true,
     "lastComposite": 57,
     "bucket": "Bridge",
     "lastAttemptDate": "2025-08-15",
-    "retestReason": "Technical issues during FLAT assessment"
+    "targetLevel": "B1",
+    "retestReason": "Grammar score below threshold"
   },
   {
     "id": "c-102",
-    "name": "Ravi Shah",
-    "email": "ravi.shah@example.com",
+    "name": "Ravi Menon",
+    "email": "ravi.m@example.com",
     "eligibleRetest": false,
     "lastComposite": 74,
     "bucket": "Admit",
     "lastAttemptDate": "2025-08-18",
+    "targetLevel": "B2",
     "retestReason": null
   },
   {
     "id": "c-103",
-    "name": "Priya Patel",
-    "email": "priya.patel@example.com",
+    "name": "Priya Nair",
+    "email": "priya.n@example.com",
     "eligibleRetest": true,
-    "lastComposite": 48,
+    "lastComposite": 45,
     "bucket": "Counselling",
     "lastAttemptDate": "2025-08-12",
-    "retestReason": "Requested review of Values assessment"
+    "targetLevel": "A2",
+    "retestReason": "Multiple subskills need improvement"
   },
   {
     "id": "c-104",
-    "name": "Ahmed Hassan",
-    "email": "ahmed.hassan@example.com",
+    "name": "Arjun Kumar",
+    "email": "arjun.k@example.com",
     "eligibleRetest": false,
     "lastComposite": 82,
     "bucket": "Admit",
     "lastAttemptDate": "2025-08-20",
+    "targetLevel": "B2",
     "retestReason": null
+  },
+  {
+    "id": "c-105",
+    "name": "Deepa Sharma",
+    "email": "deepa.s@example.com",
+    "eligibleRetest": true,
+    "lastComposite": 38,
+    "bucket": "Reject",
+    "lastAttemptDate": "2025-08-10",
+    "targetLevel": "A1",
+    "retestReason": "Significant improvement needed across all areas"
   }
 ]

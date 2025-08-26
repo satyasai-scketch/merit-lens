@@ -3,6 +3,9 @@
   "candidateId": "c-101",
   "tenantId": "t-kerala",
   "timestamp": "2025-08-15T14:30:00Z",
+  "completedDate": "2025-08-15T14:30:00Z",
+  "duration": 42,
+  "component": "FLAT",
   "scores": {
     "FLAT": 68,
     "ASP": 61,
@@ -11,14 +14,15 @@
     "COMPOSITE": 65
   },
   "subskillScores": {
-    "phonetic": 71,
+    "phonetic": 71,   
     "grammar": 64,
     "vocab": 69,
     "audio": 72,
     "memory": 65
   },
   "bucket": "Counselling",
-  "confidence": 0.85,
+  "confidence": 0.85,    
+  "recommendedLevel": "B1",
   "drivers": [
     "FLAT score slightly below admission threshold (68 vs 70 required)",
     "Strong growth mindset (72) indicates good learning potential",

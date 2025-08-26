@@ -8,11 +8,12 @@ import { AppLayout, CandidateLayout } from "@/components/AppLayout";
 
 // Pages
 import LoginPage from "./pages/LoginPage";
-import CandidateDashboard from "./pages/candidate/CandidateDashboard";
-import AssessmentsList from "./pages/candidate/AssessmentsList";
+import CandidateHome from "./pages/candidate/CandidateHome";
+import CandidateConsent from "./pages/candidate/CandidateConsent";
+import CandidateAssessments from "./pages/candidate/CandidateAssessments";
 import AssessmentDelivery from "./pages/candidate/AssessmentDelivery";
 import CandidateResults from "./pages/candidate/CandidateResults";
-import ConsentPage from "./pages/candidate/ConsentPage";
+
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import IntakesPage from "./pages/admin/IntakesPage";
 import HeatmapPage from "./pages/admin/HeatmapPage";
@@ -37,10 +38,10 @@ const App = () => (
             <Route path="/login" element={<LoginPage />} />
             
             {/* Candidate Routes */}
-            <Route element={<CandidateLayout />}>
-              <Route path="/candidate" element={<CandidateDashboard />} />
-              <Route path="/candidate/consent" element={<ConsentPage />} />
-              <Route path="/candidate/assessments" element={<AssessmentsList />} />
+             <Route element={<CandidateLayout />}>
+              <Route path="/candidate" element={<CandidateHome />} />
+              <Route path="/candidate/consent" element={<CandidateConsent />} />
+              <Route path="/candidate/assessments" element={<CandidateAssessments />} />
               <Route path="/candidate/assessments/:attemptId" element={<AssessmentDelivery />} />
               <Route path="/candidate/results/:attemptId" element={<CandidateResults />} />
             </Route>
@@ -58,6 +59,7 @@ const App = () => (
             </Route>
 
             {/* Default redirect */}
+            <Route index element={<LoginPage />} />
             <Route path="/" element={<LoginPage />} />
             
             {/* 404 */}

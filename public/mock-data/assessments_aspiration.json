@@ -7,35 +7,50 @@
     {
       "id": "asp-1",
       "type": "likert",
-      "stem": "I am excited about exploring new cultures through language learning.",
-      "scale": 5,
-      "labels": ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
+      "stem": "I want to explore new cultures and ways of life.",
+      "scale": {
+        "min": 1,
+        "max": 5,
+        "labels": ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
+      }
     },
     {
       "id": "asp-2",
       "type": "ranking",
       "stem": "Rank these priorities in order of importance to you:",
-      "options": ["Family relationships", "Career advancement", "Personal adventure", "Financial security"]
+      "options": ["Family relationships", "Career advancement", "Adventure and travel", "Security and stability"],
+      "requiredCount": 4
     },
     {
       "id": "asp-3",
       "type": "likert",
-      "stem": "Learning a new language is essential for my career goals.",
-      "scale": 5,
-      "labels": ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
+      "stem": "Learning a new language excites me.",
+      "scale": {
+        "min": 1,
+        "max": 5,
+        "labels": ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
+      }
     },
     {
       "id": "asp-4",
       "type": "single",
-      "stem": "What is your primary motivation for language learning?",
-      "options": ["Academic requirements", "Career opportunities", "Personal interest", "Travel plans", "Family heritage"]
+      "stem": "You've been offered two study abroad opportunities. Which would you choose?",
+      "options": [
+        "Choose the academically excellent program",
+        "Choose the culturally rich program",
+        "Decline both and look for other options"
+      ],
+      "requireRationale": true
     },
     {
       "id": "asp-5",
       "type": "likert",
       "stem": "I am willing to dedicate significant time daily to language practice.",
-      "scale": 5,
-      "labels": ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
+      "scale": {
+        "min": 1,
+        "max": 5,
+        "labels": ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"]
+      }
     }
   ]
 }

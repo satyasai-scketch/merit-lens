@@ -7,44 +7,68 @@
     {
       "id": "ms-1",
       "type": "likert",
-      "stem": "You can always change your basic intelligence level substantially.",
-      "scale": 6,
-      "labels": ["Strongly Disagree", "Disagree", "Mostly Disagree", "Mostly Agree", "Agree", "Strongly Agree"],
+      "stem": "You can always substantially change how intelligent you are.",
+      "scale": {
+        "min": 1,
+        "max": 6,
+        "labels": ["Strongly Disagree", "Disagree", "Mostly Disagree", "Mostly Agree", "Agree", "Strongly Agree"]
+      },
       "reverse": false
     },
     {
       "id": "ms-2",
       "type": "likert",
-      "stem": "No matter how hard you try, you can't really change your basic abilities.",
-      "scale": 6,
-      "labels": ["Strongly Disagree", "Disagree", "Mostly Disagree", "Mostly Agree", "Agree", "Strongly Agree"],
+      "stem": "Your intelligence is something about you that you can't change very much.",
+      "scale": {
+        "min": 1,
+        "max": 6,
+        "labels": ["Strongly Disagree", "Disagree", "Mostly Disagree", "Mostly Agree", "Agree", "Strongly Agree"]
+      },
       "reverse": true
     },
     {
       "id": "ms-3",
       "type": "likert",
       "stem": "When I fail at something, I tend to give up quickly.",
-      "scale": 6,
-      "labels": ["Strongly Disagree", "Disagree", "Mostly Disagree", "Mostly Agree", "Agree", "Strongly Agree"],
+      "scale": {
+        "min": 1,
+        "max": 6,
+        "labels": ["Strongly Disagree", "Disagree", "Mostly Disagree", "Mostly Agree", "Agree", "Strongly Agree"]
+      },
       "reverse": true
     },
     {
       "id": "ms-4",
       "type": "single",
-      "stem": "When facing a difficult learning challenge, I typically:",
+      "stem": "When faced with a difficult problem, what is your typical approach?",
       "options": [
-        "Avoid it to prevent failure",
-        "Try once and move on if it's hard",
-        "Keep trying different approaches",
-        "Seek help and persist until I understand"
+        "I work harder and try different strategies",
+        "I ask for help from others",
+        "I give up if it's too challenging",
+        "I look for easier alternatives"
       ]
     },
     {
       "id": "ms-5",
+      "type": "dilemma",
+      "stem": "You receive poor feedback on an important project. Your colleague suggests that you're just not cut out for this type of work. How do you respond?",
+      "options": [
+        "Accept their assessment and consider changing roles",
+        "Work harder to improve and prove them wrong",
+        "Ignore the feedback and continue as before",
+        "Seek additional perspectives before deciding"
+      ],
+      "requireRationale": true
+    },
+    {
+      "id": "ms-6",
       "type": "likert",
       "stem": "Making mistakes is an essential part of learning.",
-      "scale": 6,
-      "labels": ["Strongly Disagree", "Disagree", "Mostly Disagree", "Mostly Agree", "Agree", "Strongly Agree"],
+      "scale": {
+        "min": 1,
+        "max": 6,
+        "labels": ["Strongly Disagree", "Disagree", "Mostly Disagree", "Mostly Agree", "Agree", "Strongly Agree"]
+      },
       "reverse": false
     }
   ]

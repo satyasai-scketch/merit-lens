@@ -15,7 +15,7 @@
       "id": "flat-1",
       "type": "single",
       "subskill": "grammar",
-      "stem": "In the constructed language Lunari, the suffix '-ul' is used to pluralize nouns. Which of the following is the plural form of 'karo' (meaning 'book')?",
+      "stem": "In Lunari, '-ul' pluralizes nouns. Which is plural?",
       "options": ["karo", "karoul", "karu", "karela"],
       "timerSec": 60
     },
@@ -23,15 +23,17 @@
       "id": "flat-2",
       "type": "multi",
       "subskill": "vocab",
-      "stem": "In Lunari, select all words that mean 'small' based on the pattern examples given:",
+      "stem": "Select words meaning 'small'.",
       "options": ["mino", "grande", "peti", "alto"],
+      "minSelect": 1,
+      "maxSelect": 3,
       "timerSec": 60
     },
     {
       "id": "flat-3",
       "type": "ranking",
       "subskill": "phonetic",
-      "stem": "Order these syllables to form the Lunari word 'lanori' (meaning 'beautiful'):",
+      "stem": "Order syllables to form 'lanori'.",
       "tokens": ["la", "no", "ri"],
       "timerSec": 75
     },
@@ -39,26 +41,44 @@
       "id": "flat-4",
       "type": "sequence",
       "subskill": "memory",
-      "stem": "Memorize this sequence of Lunari syllables, then reproduce them in order:",
+      "stem": "Memorize and repeat this sequence.",
       "sequence": ["ka", "lu", "me", "ta"],
+      "allowPartialRecall": false,
       "timerSec": 45
     },
     {
       "id": "flat-5",
       "type": "audio",
       "subskill": "audio",
-      "stem": "Listen to the target pronunciation. Which of the following audio clips matches it most closely?",
-      "audioUrl": "/audio/target-1.mp3",
-      "choices": ["/audio/a1.mp3", "/audio/a2.mp3", "/audio/a3.mp3"],
+      "stem": "Which audio matches the target pronunciation?",
+      "audio": {
+        "targetUrl": "/audio/target-1.mp3",
+        "choices": ["/audio/a1.mp3", "/audio/a2.mp3", "/audio/a3.mp3"],
+        "transcript": "Pronunciation: 'lanori' with soft 'r'"
+      },
       "timerSec": 60
     },
     {
       "id": "flat-6",
-      "type": "single",
-      "subskill": "grammar",
-      "stem": "Based on the pattern, what prefix indicates past tense in Lunari?",
-      "options": ["vo-", "ka-", "mi-", "ta-"],
-      "timerSec": 60
+      "type": "match",
+      "subskill": "vocab",
+      "stem": "Match Lunari words to their meanings.",
+      "prompts": [
+        { "id": "p1", "label": "minora" },
+        { "id": "p2", "label": "karoul" },
+        { "id": "p3", "label": "solina" }
+      ],
+      "targets": [
+        { "id": "t1", "label": "small" },
+        { "id": "t2", "label": "plural form" },
+        { "id": "t3", "label": "bright" },
+        { "id": "t4", "label": "water" }
+      ],
+      "constraints": {
+        "requiredPairs": 3,
+        "allowManyToOne": false
+      },
+      "timerSec": 90
     }
   ]
 }

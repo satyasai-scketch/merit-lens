@@ -58,6 +58,7 @@ const App = () => (
             </Route>
 
             {/* Default redirect */}
+            <Route index element={<LoginPage />} />
             <Route path="/" element={<LoginPage />} />
             
             {/* 404 */}

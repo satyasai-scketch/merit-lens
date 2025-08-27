@@ -53,7 +53,7 @@
       "id": "val-4",
       "type": "ranking",
       "stem": "Rank these life priorities in order of importance:",
-      "options": [
+      "tokens": [
         "Personal happiness", "Professional success",
         "Family harmony", "Social recognition", "Financial stability"
       ],

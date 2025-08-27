@@ -18,7 +18,7 @@
       "id": "asp-2",
       "type": "ranking",
       "stem": "Rank these priorities in order of importance to you:",
-      "options": ["Family relationships", "Career advancement", "Adventure and travel", "Security and stability"],
+      "tokens": ["Family relationships", "Career advancement", "Adventure and travel", "Security and stability"],
       "requiredCount": 4
     },
     {

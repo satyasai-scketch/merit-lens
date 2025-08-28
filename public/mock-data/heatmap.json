@@ -8,6 +8,14 @@
     [78, 74, 61, 45],
     [69, 64, 52, 36]
   ],
-  "candidateCount": 108,
-  "lastUpdated": "2025-08-23T10:30:00Z"
+  "averages": {
+    "bySubskill": [52, 67, 55, 65, 55],
+    "byLevel": [72, 67, 55, 39]
+  },
+  "metadata": {
+    "totalCandidates": 108,
+    "dateRange": "2025-08-01 to 2025-08-23",
+    "intakeId": "intake-2025-fall",
+    "lastUpdated": "2025-08-23T10:30:00Z"
+  }
 }

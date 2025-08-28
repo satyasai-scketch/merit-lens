@@ -13,9 +13,11 @@ import {
   TrendingUp
 } from 'lucide-react';
 
+
 const candidateNavItems = [
   { to: '/candidate', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/candidate/assessments', label: 'Assessments', icon: ClipboardList },
+
 ];
 
 const adminNavItems = [

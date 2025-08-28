@@ -1,44 +1,42 @@
 {
-  "attemptId": "complete-demo-1",
-  "candidateId": "c-102",
-  "tenantId": "t-kerala",
-  "timestamp": "2025-08-18T16:45:00Z",
+  "attemptId": "ATT-2025-001",
+  "candidateId": "C-101",
+  "tenantId": "LANG-INST-01",
+  "timestamp": "2025-08-25T09:30:00Z",
+  "completedDate": "2025-08-25",
+  "duration": 42,
+  "component": "Foreign Language Aptitude Test",
   "scores": {
-    "FLAT": 76,
-    "ASP": 84,
-    "VAL": 78,
-    "MS": 81,
-    "COMPOSITE": 79
+    "FLAT": 72,
+    "ASP": 68,
+    "VAL": 75,
+    "MS": 70,
+    "COMPOSITE": 71
   },
   "subskillScores": {
-    "phonetic": 78,
-    "grammar": 74,
-    "vocab": 79,
-    "audio": 76,
-    "memory": 73
+    "phonetic": 15,
+    "grammar": 14,
+    "vocab": 13,
+    "audio": 15,
+    "memory": 15
   },
-  "bucket": "Admit",
-  "confidence": 0.92,
+  "bucket": "Bridge",
+  "confidence": 0.83,
+  "recommendedLevel": "A2",
   "drivers": [
-    "FLAT score well above threshold (76 vs 70 required)",
-    "Exceptional aspiration and motivation (84)",
-    "Strong values alignment (78) indicating good cultural fit",
-    "Growth mindset (81) supports long-term success"
+    "Strong phonetic retention",
+    "Good listening comprehension"
   ],
   "nextSteps": [
-    "Proceed with formal admission process",
-    "Schedule orientation session for advanced track",
-    "Connect with student mentor program",
-    "Begin pre-course reading materials"
+    "Enroll in A2 Bridge program",
+    "Practice grammar drills"
   ],
   "strengths": [
-    "Excellent overall language aptitude",
-    "High motivation and commitment",
-    "Strong cultural alignment",
-    "Resilient learning approach"
+    "Phonetic recognition",
+    "Vocabulary retention"
   ],
   "developmentAreas": [
-    "Continue building academic vocabulary",
-    "Maintain consistency in study habits"
+    "Complex grammar inference",
+    "Working memory under stress"
   ]
 }

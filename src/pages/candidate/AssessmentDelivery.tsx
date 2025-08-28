@@ -1,93 +1,105 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { AlertCircle, Clock, Save, ArrowRight, ArrowLeft } from 'lucide-react';
-import { loadAssessment, saveAttemptState, loadAttemptState } from '@/lib/data';
-import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/uiA/card';
+import { Button } from '@/components/uiA/button';
+import { Progress } from '@/components/uiA/progress';
+import { Badge } from '@/components/uiA/badge';
+import { Switch } from '@/components/uiA/switch';
+import { Label } from '@/components/uiA/label';
+import { RadioGroup, RadioGroupItem } from '@/components/uiA/radio-group';
+import { Checkbox } from '@/components/uiA/checkbox';
+import { 
+  Clock, 
+  Save, 
+  ChevronLeft, 
+  ChevronRight,
+  AlertCircle,
+  Home,
+  BookOpen,
+  Play
+} from 'lucide-react';
+import { session, attempts, type AttemptData } from '@/lib/session';
+import { api, type AssessmentItem } from '../../lib/api';
+import { toast } from '@/hooks/use-toast';
+import QuestionNavigator, { type QuestionStatus } from '@/components/assessment/QuestionNavigator';
+import QuestionRenderer from '@/components/assessment/QuestionRenderer';
 
 export default function AssessmentDelivery() {
   const { attemptId } = useParams<{ attemptId: string }>();
   const navigate = useNavigate();
-  const { toast } = useToast();
   
-  const [assessment, setAssessment] = useState<any>(null);
-  const [attemptState, setAttemptState] = useState<any>(null);
+  const [attempt, setAttempt] = useState<AttemptData | null>(null);
+  const [items, setItems] = useState<AssessmentItem[]>([]);
   const [currentItemIndex, setCurrentItemIndex] = useState(0);
-  const [responses, setResponses] = useState<Record<string, any>>({});
+  const [currentAnswer, setCurrentAnswer] = useState<any>(null);
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [markedForReview, setMarkedForReview] = useState<Set<number>>(new Set());
+  const [questionStatuses, setQuestionStatuses] = useState<Map<number, string>>(new Map());
 
+  // Load attempt and assessment data
   useEffect(() => {
     if (!attemptId) return;
 
-    // Load attempt state - check both attempt state and attempts list
-    let state = loadAttemptState(attemptId);
-    
-    if (!state) {
-      // Try to find in attempts list and create state if found
-      const attempts = JSON.parse(localStorage.getItem('assessment_attempts') || '[]');
-      const attempt = attempts.find((a: any) => a.attemptId === attemptId);
-      
-      if (attempt) {
-        // Create initial attempt state
-        state = {
-          attemptId: attempt.attemptId,
-          componentType: attempt.componentType,
-          currentItemIndex: 0,
-          responses: {},
-          startedAt: attempt.startedAt,
-          lastSavedAt: new Date().toISOString(),
-          status: 'in-progress'
-        };
-        saveAttemptState(state);
-      }
-    }
-    
-    if (!state) {
-      // Show error page instead of toast and redirect
-      setLoading(false);
-      return;
-    }
-
-    // Load assessment data
-    loadAssessment(state.componentType as 'flat' | 'aspiration' | 'values' | 'mindset')
-      .then(assessmentData => {
-        setAssessment(assessmentData);
-        setAttemptState(state);
-        setCurrentItemIndex(state.currentItemIndex || 0);
-        setResponses(state.responses || {});
-        
-        // Set timer for current item
-        const currentItem = assessmentData.items[state.currentItemIndex || 0];
-        if (currentItem?.timerSec) {
-          setTimeRemaining(currentItem.timerSec);
+    const loadData = async () => {
+      try {
+        const attemptData = attempts.get(attemptId);
+        if (!attemptData) {
+          toast({
+            title: "Attempt Not Found",
+            description: "The assessment attempt could not be found.",
+            variant: "destructive"
+          });
+          navigate('/candidate/assessments');
+          return;
         }
-        
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('Failed to load assessment:', error);
+
+        setAttempt(attemptData);
+
+        // Load assessment items
+        const assessmentData = await api.loadAssessments(attemptData.component);
+        setItems(assessmentData.items);
+
+        // Find current position
+        const lastResponseIndex = attemptData.responses.length > 0 
+          ? Math.max(...attemptData.responses.map((_, idx) => idx))
+          : 0;
+        setCurrentItemIndex(Math.min(lastResponseIndex, assessmentData.items.length - 1));
+
+        // Load existing answer for current item
+        const existingResponse = attemptData.responses[currentItemIndex];
+        if (existingResponse) {
+          setCurrentAnswer(existingResponse.answer);
+        }
+
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error loading assessment:', error);
         toast({
-          title: "Error",
+          title: "Loading Error",
           description: "Failed to load assessment data.",
           variant: "destructive"
         });
-        navigate('/candidate');
-      });
-  }, [attemptId, navigate, toast]);
+        navigate('/candidate/assessments');
+      }
+    };
 
-  // Timer effect
+    loadData();
+  }, [attemptId, navigate]);
+
+  // Timer logic
   useEffect(() => {
-    if (timeRemaining === null || timeRemaining <= 0) return;
+    const currentItem = items[currentItemIndex];
+    if (!currentItem?.timerSec) return;
+
+    setTimeRemaining(currentItem.timerSec);
 
     const timer = setInterval(() => {
       setTimeRemaining(prev => {
         if (prev === null || prev <= 1) {
-          // Time's up - auto advance
-          handleNext(true);
+          // Auto-advance on timeout
+          handleNextItem();
           return null;
         }
         return prev - 1;
@@ -95,490 +107,341 @@ export default function AssessmentDelivery() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeRemaining]);
+  }, [currentItemIndex, items]);
 
-  // Auto-save effect
-  useEffect(() => {
-    const autoSave = setInterval(() => {
-      if (attemptState) {
-        saveCurrentState();
-      }
-    }, 10000); // Auto-save every 10 seconds
+  // Auto-save responses
+  const saveResponse = useCallback((answer: any, timeSpent: number) => {
+    if (!attempt || !items[currentItemIndex]) return;
 
-    return () => clearInterval(autoSave);
-  }, [attemptState, currentItemIndex, responses]);
-
-  const saveCurrentState = () => {
-    if (!attemptState) return;
-    
-    const updatedState = {
-      ...attemptState,
-      currentItemIndex,
-      responses,
-      lastSavedAt: new Date().toISOString()
+    const updatedAttempt = { ...attempt };
+    const response = {
+      itemId: items[currentItemIndex].id,
+      answer,
+      timeSpent,
+      timestamp: new Date().toISOString()
     };
-    
-    saveAttemptState(updatedState);
-    setAttemptState(updatedState);
-  };
 
-  const handleResponse = (itemId: string, response: any) => {
-    setResponses(prev => ({
-      ...prev,
-      [itemId]: response
-    }));
-  };
-
-  const handleNext = (isTimeout = false) => {
-    if (!assessment) return;
-
-    // Save current response if timeout and no response given
-    const currentItem = assessment.items[currentItemIndex];
-    if (isTimeout && !responses[currentItem.id]) {
-      setResponses(prev => ({
-        ...prev,
-        [currentItem.id]: { type: 'timeout', value: null }
-      }));
-    }
-
-    if (currentItemIndex < assessment.items.length - 1) {
-      const nextIndex = currentItemIndex + 1;
-      setCurrentItemIndex(nextIndex);
-      
-      // Set timer for next item
-      const nextItem = assessment.items[nextIndex];
-      if (nextItem?.timerSec) {
-        setTimeRemaining(nextItem.timerSec);
-      } else {
-        setTimeRemaining(null);
-      }
+    // Update or add response
+    if (updatedAttempt.responses[currentItemIndex]) {
+      updatedAttempt.responses[currentItemIndex] = response;
     } else {
-      handleSubmit();
+      updatedAttempt.responses[currentItemIndex] = response;
+    }
+
+    updatedAttempt.lastSavedAt = new Date().toISOString();
+    attempts.save(updatedAttempt);
+    setAttempt(updatedAttempt);
+  }, [attempt, items, currentItemIndex]);
+
+  const handleNextItem = () => {
+    if (currentAnswer !== null) {
+      const currentItem = items[currentItemIndex];
+      const timeSpent = currentItem?.timerSec ? currentItem.timerSec - (timeRemaining || 0) : 0;
+      saveResponse(currentAnswer, timeSpent);
+    }
+
+    if (currentItemIndex < items.length - 1) {
+      setCurrentItemIndex(prev => prev + 1);
+      setCurrentAnswer(null);
+    } else {
+      handleSubmitAssessment();
     }
   };
 
-  const handlePrevious = () => {
+  const handlePreviousItem = () => {
     if (currentItemIndex > 0) {
-      const prevIndex = currentItemIndex - 1;
-      setCurrentItemIndex(prevIndex);
-      
-      // Set timer for previous item (reset to full time)
-      const prevItem = assessment.items[prevIndex];
-      if (prevItem?.timerSec) {
-        setTimeRemaining(prevItem.timerSec);
-      } else {
-        setTimeRemaining(null);
-      }
+      setCurrentItemIndex(prev => prev - 1);
+      // Load previous answer
+      const prevResponse = attempt?.responses[currentItemIndex - 1];
+      setCurrentAnswer(prevResponse?.answer || null);
     }
   };
 
-  const handleSubmit = () => {
-    if (!attemptState) return;
+  const handleSubmitAssessment = async () => {
+    if (!attempt) return;
 
-    // Mark as completed
-    const completedState = {
-      ...attemptState,
-      currentItemIndex,
-      responses,
-      status: 'completed',
-      completedAt: new Date().toISOString()
-    };
+    setIsSubmitting(true);
+    try {
+      // Save final response if there is one
+      if (currentAnswer !== null) {
+        const currentItem = items[currentItemIndex];
+        const timeSpent = currentItem?.timerSec ? currentItem.timerSec - (timeRemaining || 0) : 0;
+        saveResponse(currentAnswer, timeSpent);
+      }
 
-    saveAttemptState(completedState);
+      // Submit to API (simulated)
+      await api.submitAssessment(attempt.id, attempt.responses);
 
-    // Update attempts list
-    const attempts = JSON.parse(localStorage.getItem('assessment_attempts') || '[]');
-    const updatedAttempts = attempts.map((a: any) => 
-      a.attemptId === attemptId ? { ...a, status: 'completed' } : a
-    );
-    localStorage.setItem('assessment_attempts', JSON.stringify(updatedAttempts));
+      // Mark as completed
+      const completedAttempt = {
+        ...attempt,
+        status: 'completed' as const,
+        lastSavedAt: new Date().toISOString()
+      };
+      attempts.save(completedAttempt);
 
-    toast({
-      title: "Assessment Submitted",
-      description: "Your responses have been saved successfully."
-    });
+      toast({
+        title: "Assessment Submitted",
+        description: "Your assessment has been submitted successfully. Results are being processed."
+      });
 
-    navigate(`/candidate/results/${attemptId}`);
+      navigate(`/candidate/results/${attempt.id}`);
+    } catch (error) {
+      console.error('Error submitting assessment:', error);
+      toast({
+        title: "Submission Error",
+        description: "Failed to submit assessment. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleSaveAndExit = () => {
-    saveCurrentState();
+    if (currentAnswer !== null) {
+      const currentItem = items[currentItemIndex];
+      const timeSpent = currentItem?.timerSec ? currentItem.timerSec - (timeRemaining || 0) : 0;
+      saveResponse(currentAnswer, timeSpent);
+    }
+
     toast({
       title: "Progress Saved",
       description: "Your progress has been saved. You can continue later."
     });
-    navigate('/candidate');
+
+    navigate('/candidate/assessments');
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full"></div>
-      </div>
-    );
-  }
-
-  // Show error page if assessment attempt not found
-  if (!assessment || !attemptState) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="max-w-md mx-auto text-center space-y-4 p-6">
-          <div className="text-6xl mb-4">📋</div>
-          <h1 className="text-2xl font-bold">Assessment Not Found</h1>
-          <p className="text-muted-foreground">
-            This assessment attempt could not be found. Please return to the Assessments page to start or continue your assessments.
-          </p>
-          <div className="space-y-2">
-            <Button 
-              onClick={() => navigate('/candidate/assessments')}
-              className="w-full"
-            >
-              Back to Assessments
-            </Button>
-            <Button 
-              onClick={() => navigate('/candidate')}
-              variant="outline"
-              className="w-full"
-            >
-              Back to Dashboard
-            </Button>
-          </div>
+        <div className="text-center">
+          <Clock className="h-12 w-12 animate-spin mx-auto mb-4 text-primary" />
+          <p>Loading assessment...</p>
         </div>
       </div>
     );
   }
 
-  const currentItem = assessment.items[currentItemIndex];
-  const progress = ((currentItemIndex + 1) / assessment.items.length) * 100;
-  const isLastItem = currentItemIndex === assessment.items.length - 1;
+  if (!attempt || !items.length) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <AlertCircle className="h-5 w-5 text-destructive" />
+              <span>Assessment Not Available</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              The assessment could not be loaded. Please try again.
+            </p>
+            <Button onClick={() => navigate('/candidate/assessments')}>
+              <Home className="h-4 w-4 mr-2" />
+              Return to Assessments
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const currentItem = items[currentItemIndex];
+  const progress = ((currentItemIndex + 1) / items.length) * 100;
+  const isLastItem = currentItemIndex === items.length - 1;
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="bg-card border-b border-border shadow-subtle">
-        <div className="max-w-4xl mx-auto px-6 py-4">
+      {/* Assessment Header */}
+      <header className="border-b bg-card shadow-sm sticky top-0 z-10">
+        <div className="mx-auto max-w-4xl px-4 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-lg font-semibold">{assessment.name}</h1>
-              <p className="text-sm text-muted-foreground">
-                Question {currentItemIndex + 1} of {assessment.items.length}
-              </p>
+            <div className="flex items-center space-x-4">
+              <Badge variant="outline">
+                {attempt.component.toUpperCase()}
+              </Badge>
+              <span className="text-sm text-muted-foreground">
+                Question {currentItemIndex + 1} of {items.length}
+              </span>
             </div>
-            
-            <div className="flex items-center gap-4">
+
+            <div className="flex items-center space-x-4">
               {timeRemaining !== null && (
-                <div className={`flex items-center gap-2 ${timeRemaining <= 10 ? 'timer-critical' : timeRemaining <= 30 ? 'timer-warning' : ''}`}>
-                  <Clock className="h-4 w-4" />
-                  <span className="font-mono text-sm">
+                <div className="flex items-center space-x-2">
+                  <Clock className="h-4 w-4 text-warning" />
+                  <span className={`text-sm font-mono ${timeRemaining <= 10 ? 'text-destructive' : 'text-foreground'}`}>
                     {Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')}
                   </span>
                 </div>
               )}
-              
+
               <Button 
                 variant="outline" 
-                size="sm"
+                size="sm" 
                 onClick={handleSaveAndExit}
-                className="gap-2"
+                disabled={isSubmitting}
               >
-                <Save className="h-4 w-4" />
+                <Save className="h-4 w-4 mr-2" />
                 Save & Exit
               </Button>
             </div>
           </div>
-          
-          <div className="mt-4">
-            <Progress value={progress} className="h-2" />
-          </div>
+
+          <Progress value={progress} className="mt-4" />
         </div>
-      </div>
+      </header>
 
       {/* Assessment Content */}
-      <div className="max-w-3xl mx-auto p-6">
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">
-                {currentItem.subskill && (
-                  <Badge variant="secondary" className="mr-2">
-                    {currentItem.subskill}
-                  </Badge>
-                )}
-                Question {currentItemIndex + 1}
-              </CardTitle>
-              
-              {timeRemaining !== null && timeRemaining <= 30 && (
-                <Badge variant="destructive" className="gap-1">
-                  <AlertCircle className="h-3 w-3" />
-                  {timeRemaining}s remaining
-                </Badge>
-              )}
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="text-lg leading-relaxed">
-              {currentItem.stem}
-            </div>
+      <main className="mx-auto max-w-7xl px-4 py-8">
+        <div className="flex gap-6">
+          {/* Left Navigation */}
+          <div className="w-64 flex-shrink-0">
+            <QuestionNavigator
+              questions={items.map((item, index) => ({
+                id: item.id,
+                type: item.type,
+                number: index + 1,
+                index: index,
+                status: markedForReview.has(index) 
+                  ? 'marked' 
+                  : attempt?.responses[index]?.answer !== undefined 
+                    ? 'answered' 
+                    : index <= currentItemIndex 
+                      ? 'seen_unanswered' 
+                      : 'not_seen'
+              }))}
+              currentIndex={currentItemIndex}
+              onNavigate={(index) => {
+                // Save current answer before navigating
+                if (currentAnswer !== null) {
+                  const currentItem = items[currentItemIndex];
+                  const timeSpent = currentItem?.timerSec ? currentItem.timerSec - (timeRemaining || 0) : 0;
+                  saveResponse(currentAnswer, timeSpent);
+                }
+                
+                setCurrentItemIndex(index);
+                // Load answer for the target question
+                const targetResponse = attempt?.responses[index];
+                setCurrentAnswer(targetResponse?.answer || null);
+              }}
+            />
+          </div>
 
-            {/* Render different item types */}
-            <div className="space-y-3">
-              {currentItem.type === 'single' && (
-                <div className="space-y-2">
-                  {currentItem.options?.map((option: string, index: number) => (
-                    <label key={index} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-accent cursor-pointer">
-                      <input
-                        type="radio"
-                        name={`item-${currentItem.id}`}
-                        value={option}
-                        checked={responses[currentItem.id]?.value === option}
-                        onChange={(e) => handleResponse(currentItem.id, { type: 'single', value: e.target.value })}
-                        className="text-primary"
-                      />
-                      <span>{option}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-
-              {currentItem.type === 'multi' && (
-                <div className="space-y-2">
-                  {currentItem.options?.map((option: string, index: number) => (
-                    <label key={index} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-accent cursor-pointer">
-                      <input
-                        type="checkbox"
-                        value={option}
-                        checked={responses[currentItem.id]?.value?.includes(option) || false}
-                        onChange={(e) => {
-                          const currentValues = responses[currentItem.id]?.value || [];
-                          const newValues = e.target.checked
-                            ? [...currentValues, option]
-                            : currentValues.filter((v: string) => v !== option);
-                          handleResponse(currentItem.id, { type: 'multi', value: newValues });
+          {/* Main Content */}
+          <div className="flex-1">
+            <Card className="min-h-[400px]">
+              <CardContent className="p-8">
+                {/* Question Content */}
+                <div className="mb-8">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <Badge variant="secondary">
+                        {currentItem.type.toUpperCase()}
+                      </Badge>
+                      <h2 className="text-xl font-semibold">
+                        {currentItem.stem}
+                      </h2>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="mark-review"
+                        checked={markedForReview.has(currentItemIndex)}
+                        onCheckedChange={(checked) => {
+                          const newMarked = new Set(markedForReview);
+                          if (checked) {
+                            newMarked.add(currentItemIndex);
+                          } else {
+                            newMarked.delete(currentItemIndex);
+                          }
+                          setMarkedForReview(newMarked);
                         }}
-                        className="text-primary"
                       />
-                      <span>{option}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-
-              {currentItem.type === 'likert' && (
-                <div className="space-y-4">
-                  <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>{currentItem.labels?.[0]}</span>
-                    <span>{currentItem.labels?.[currentItem.labels.length - 1]}</span>
-                  </div>
-                  <div className="flex justify-between gap-2">
-                    {Array.from({ length: currentItem.scale || 5 }, (_, i) => i + 1).map(value => (
-                      <label key={value} className="flex flex-col items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          name={`item-${currentItem.id}`}
-                          value={value}
-                          checked={responses[currentItem.id]?.value === value}
-                          onChange={() => handleResponse(currentItem.id, { type: 'likert', value })}
-                          className="text-primary"
-                        />
-                        <span className="text-sm">{value}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {currentItem.type === 'ranking' && (
-                <div className="space-y-3">
-                  <p className="text-sm text-muted-foreground">Drag items to reorder them, or use the buttons to move items up/down:</p>
-                  <div className="space-y-2">
-                    {(responses[currentItem.id]?.value || currentItem.options || currentItem.tokens || []).map((item: string, index: number) => (
-                      <div key={item} className="flex items-center gap-3 p-3 border rounded-lg">
-                        <span className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-medium">
-                          {index + 1}
-                        </span>
-                        <span className="flex-1">{item}</span>
-                        <div className="flex gap-1">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => {
-                              const currentList = responses[currentItem.id]?.value || currentItem.options || currentItem.tokens || [];
-                              if (index > 0) {
-                                const newList = [...currentList];
-                                [newList[index], newList[index - 1]] = [newList[index - 1], newList[index]];
-                                handleResponse(currentItem.id, { type: 'ranking', value: newList });
-                              }
-                            }}
-                            disabled={index === 0}
-                          >
-                            ↑
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => {
-                              const currentList = responses[currentItem.id]?.value || currentItem.options || currentItem.tokens || [];
-                              if (index < currentList.length - 1) {
-                                const newList = [...currentList];
-                                [newList[index], newList[index + 1]] = [newList[index + 1], newList[index]];
-                                handleResponse(currentItem.id, { type: 'ranking', value: newList });
-                              }
-                            }}
-                            disabled={index === (responses[currentItem.id]?.value || currentItem.options || currentItem.tokens || []).length - 1}
-                          >
-                            ↓
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {currentItem.type === 'sequence' && (
-                <div className="space-y-4">
-                  {!responses[currentItem.id] ? (
-                    <div className="text-center space-y-4">
-                      <div className="p-6 border-2 border-dashed rounded-lg">
-                        <p className="text-sm text-muted-foreground mb-4">Memorize this sequence:</p>
-                        <div className="flex justify-center gap-2 mb-4">
-                          {currentItem.sequence?.map((item: string, index: number) => (
-                            <span key={index} className="px-3 py-2 bg-primary/10 rounded-lg font-mono text-lg">
-                              {item}
-                            </span>
-                          ))}
-                        </div>
-                        <Button
-                          onClick={() => {
-                            handleResponse(currentItem.id, { type: 'sequence', phase: 'input', value: [] });
-                          }}
-                        >
-                          I'm Ready - Start Input
-                        </Button>
-                      </div>
+                      <Label htmlFor="mark-review" className="text-sm">
+                        Mark for Review
+                      </Label>
                     </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <p className="text-sm text-muted-foreground">Enter the sequence in the correct order:</p>
-                      <div className="flex justify-center gap-2 mb-4">
-                        {(responses[currentItem.id]?.value || []).map((item: string, index: number) => (
-                          <span key={index} className="px-3 py-2 bg-primary/10 rounded-lg font-mono text-lg">
-                            {item}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="flex justify-center gap-2 flex-wrap">
-                        {currentItem.sequence?.map((item: string) => (
-                          <Button
-                            key={item}
-                            variant="outline"
-                            onClick={() => {
-                              const current = responses[currentItem.id]?.value || [];
-                              const newValue = [...current, item];
-                              handleResponse(currentItem.id, { type: 'sequence', phase: 'input', value: newValue });
-                            }}
-                            disabled={(responses[currentItem.id]?.value || []).includes(item)}
-                          >
-                            {item}
-                          </Button>
-                        ))}
-                      </div>
-                      {responses[currentItem.id]?.value?.length > 0 && (
-                        <div className="text-center">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              handleResponse(currentItem.id, { type: 'sequence', phase: 'input', value: [] });
-                            }}
-                          >
-                            Clear & Start Over
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {currentItem.type === 'audio' && (
-                <div className="space-y-4">
-                  <div className="bg-accent/50 p-4 rounded-lg">
-                    <p className="text-sm text-muted-foreground mb-3">Listen to the target audio:</p>
-                    <audio controls className="w-full mb-3">
-                      <source src={currentItem.audioUrl} type="audio/mpeg" />
-                      Your browser does not support the audio element.
-                    </audio>
-                    <p className="text-xs text-muted-foreground">
-                      Audio transcription available on request for accessibility.
-                    </p>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">Select the matching audio:</p>
-                    {currentItem.choices?.map((choice: string, index: number) => (
-                      <label key={index} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-accent cursor-pointer">
-                        <input
-                          type="radio"
-                          name={`item-${currentItem.id}`}
-                          value={choice}
-                          checked={responses[currentItem.id]?.value === choice}
-                          onChange={(e) => handleResponse(currentItem.id, { type: 'audio', value: e.target.value })}
-                          className="text-primary"
-                        />
-                        <audio controls className="flex-1">
-                          <source src={choice} type="audio/mpeg" />
-                          Option {index + 1}
-                        </audio>
-                      </label>
-                    ))}
                   </div>
                 </div>
-              )}
 
-              {currentItem.type === 'dilemma' && (
-                <div className="space-y-2">
-                  {currentItem.options?.map((option: string, index: number) => (
-                    <label key={index} className="flex items-start space-x-3 p-4 border rounded-lg hover:bg-accent cursor-pointer">
-                      <input
-                        type="radio"
-                        name={`item-${currentItem.id}`}
-                        value={option}
-                        checked={responses[currentItem.id]?.value === option}
-                        onChange={(e) => handleResponse(currentItem.id, { type: 'dilemma', value: e.target.value })}
-                        className="text-primary mt-1"
-                      />
-                      <span className="flex-1">{option}</span>
-                    </label>
-                  ))}
+                {/* Question Renderer */}
+                <div className="mb-8">
+                  <QuestionRenderer
+                    item={currentItem}
+                    value={currentAnswer}
+                    onChange={setCurrentAnswer}
+                  />
                 </div>
-              )}
-            </div>
+              </CardContent>
+            </Card>
 
             {/* Navigation */}
-            <div className="flex justify-between pt-6">
-              <Button
+            <div className="flex justify-between mt-6">
+              <Button 
                 variant="outline"
-                onClick={handlePrevious}
+                onClick={handlePreviousItem}
                 disabled={currentItemIndex === 0}
-                className="gap-2"
               >
-                <ArrowLeft className="h-4 w-4" />
+                <ChevronLeft className="h-4 w-4 mr-2" />
                 Previous
               </Button>
 
-              <Button
-                onClick={() => handleNext()}
-                disabled={!responses[currentItem.id]}
-                className="gap-2"
-              >
-                {isLastItem ? 'Submit Assessment' : 'Next'}
-                {!isLastItem && <ArrowRight className="h-4 w-4" />}
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline"
+                  onClick={() => {
+                    // Skip logic - go to next without saving answer
+                    if (currentItemIndex < items.length - 1) {
+                      setCurrentItemIndex(prev => prev + 1);
+                      setCurrentAnswer(null);
+                    } else {
+                      handleSubmitAssessment();
+                    }
+                  }}
+                >
+                  Skip
+                </Button>
+
+                <Button 
+                  variant="outline"
+                  onClick={() => {
+                    // Mark for review and go to next
+                    const newMarked = new Set(markedForReview);
+                    newMarked.add(currentItemIndex);
+                    setMarkedForReview(newMarked);
+                    
+                    // Save current answer if exists
+                    if (currentAnswer !== null) {
+                      const currentItem = items[currentItemIndex];
+                      const timeSpent = currentItem?.timerSec ? currentItem.timerSec - (timeRemaining || 0) : 0;
+                      saveResponse(currentAnswer, timeSpent);
+                    }
+                    
+                    if (currentItemIndex < items.length - 1) {
+                      setCurrentItemIndex(prev => prev + 1);
+                      setCurrentAnswer(null);
+                    } else {
+                      handleSubmitAssessment();
+                    }
+                  }}
+                >
+                  Mark for Review & Next
+                </Button>
+
+                <Button 
+                  onClick={isLastItem ? handleSubmitAssessment : handleNextItem}
+                  disabled={currentAnswer === null || isSubmitting}
+                >
+                  {isSubmitting ? 'Submitting...' : isLastItem ? 'Submit Assessment' : 'Next'}
+                  {!isLastItem && <ChevronRight className="h-4 w-4 ml-2" />}
+                </Button>
+              </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }
